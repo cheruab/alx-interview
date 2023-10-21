@@ -1,49 +1,44 @@
 #!/usr/bin/python3
-"""
-    script that reads stdin line by line and computes metrics
-"""
+""" script that reads stdin line by line and computes metrics """
+
 import sys
 
 
-def print_msg(codes, file_size):
-    print("File size: {}".format(file_size))
-    for key, val in sorted(codes.items()):
-        if val != 0:
-            print("{}: {}".format(key, val))
+def printsts(dic, size):
+    """ Prints information """
+    print("File size: {:d}".format(size))
+    for i in sorted(dic.keys()):
+        if dic[i] != 0:
+            print("{}: {:d}".format(i, dic[i]))
 
 
-file_size = 0
-code = 0
-count_lines = 0
-codes = {
-    "200": 0,
-    "301": 0,
-    "400": 0,
-    "401": 0,
-    "403": 0,
-    "404": 0,
-    "405": 0,
-    "500": 0
-}
+sts = {"200": 0, "301": 0, "400": 0, "401": 0, "403": 0,
+       "404": 0, "405": 0, "500": 0}
+
+count = 0
+size = 0
 
 try:
     for line in sys.stdin:
-        parsed_line = line.split()
-        parsed_line = parsed_line[::-1]
+        if count != 0 and count % 10 == 0:
+            printsts(sts, size)
 
-        if len(parsed_line) > 2:
-            count_lines += 1
+        stlist = line.split()
+        count += 1
 
-            if count_lines <= 10:
-                file_size += int(parsed_line[0])
-                code = parsed_line[1]
+        try:
+            size += int(stlist[-1])
+        except:
+            pass
 
-                if (code in codes.keys()):
-                    codes[code] += 1
+        try:
+            if stlist[-2] in sts:
+                sts[stlist[-2]] += 1
+        except:
+            pass
+    printsts(sts, size)
 
-            if (count_lines == 10):
-                print_msg(codes, file_size)
-                count_lines = 0
 
-finally:
-    print_msg(codes, file_size)
+except KeyboardInterrupt:
+    printsts(sts, size)
+    raise
